@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Code Helper - Settings</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .header {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.8;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .tab-container {
+            display: flex;
+            gap: 0;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #6495ed;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .form-group select option {
+            background: #333;
+            color: white;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background: #6495ed;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a85d8;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .shortcut-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+        .shortcut-key {
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #6495ed;
+            margin-bottom: 5px;
+        }
+        .shortcut-desc {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        .status-indicator.connected {
+            background: #4CAF50;
+        }
+        .status-indicator.disconnected {
+            background: #f44336;
+        }
+        .help-text {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        .overlay-preview {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 200px;
+            margin: 20px auto;
+        }
+        .position-option {
+            width: 40px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .position-option:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .position-option.active {
+            background: #6495ed;
+            border-color: #6495ed;
+        }
+        .success-message {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+            color: #4CAF50;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            display: none;
+        }
+        .error-message {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+            color: #f44336;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 Code Helper Settings</h1>
+        <p>Configure your intelligent coding assistant</p>
+    </div>
+    
+    <div class="container">
+        <div class="tab-container">
+            <button class="tab active" data-tab="ai">🤖 AI Configuration</button>
+            <button class="tab" data-tab="shortcuts">⌨️ Shortcuts</button>
+            <button class="tab" data-tab="overlay">🎨 Overlay</button>
+            <button class="tab" data-tab="about">ℹ️ About</button>
+        </div>
+        
+        <!-- AI Configuration Tab -->
+        <div class="tab-content active" data-content="ai">
+            <h3>AI Provider Configuration</h3>
+            
+            <div class="form-group">
+                <label for="api-provider">AI Provider</label>
+                <select id="api-provider">
+                    <option value="openai">OpenAI (GPT-3.5/GPT-4)</option>
+                    <option value="gemini">Google Gemini</option>
+                    <option value="claude">Anthropic Claude</option>
+                    <option value="ollama">Ollama (Local)</option>
+                </select>
+                <div class="help-text">Choose your preferred AI provider for code generation</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="api-key">API Key <span class="status-indicator disconnected" id="api-status"></span></label>
+                <input type="password" id="api-key" placeholder="Enter your API key here...">
+                <div class="help-text" id="api-help">
+                    Get your OpenAI API key from: <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #6495ed;">https://platform.openai.com/api-keys</a>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="model">Model</label>
+                    <select id="model">
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Faster)</option>
+                        <option value="gpt-4">GPT-4 (Better Quality)</option>
+                           <option value="gemini-2.0-flash">Gemini-2.0-flash (Better Quality)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="temperature">Creativity Level</label>
+                    <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7">
+                    <div class="help-text">Lower = more focused, Higher = more creative</div>
+                </div>
+            </div>
+            
+            <div class="success-message" id="ai-success">✅ Settings saved successfully!</div>
+            <div class="error-message" id="ai-error"></div>
+            
+            <button class="btn btn-primary" id="save-ai-settings">💾 Save AI Settings</button>
+            <button class="btn btn-secondary" id="test-api">🧪 Test API Connection</button>
+        </div>
+        
+        <!-- Shortcuts Tab -->
+        <div class="tab-content" data-content="shortcuts">
+            <h3>Keyboard Shortcuts</h3>
+            
+            <div class="shortcuts-grid">
+                <div class="shortcut-card">
+                    <div class="shortcut-key">Ctrl+L</div>
+                    <div class="shortcut-desc">Activate overlay</div>
+                </div>
+                <div class="shortcut-card">
+                    <div class="shortcut-key">Ctrl+Shift+C</div>
+                    <div class="shortcut-desc">Quick code helper</div>
+                </div>
+                <div class="shortcut-card">
+                    <div class="shortcut-key">F12</div>
+                    <div class="shortcut-desc">Developer mode</div>
+                </div>
+                <div class="shortcut-card">
+                    <div class="shortcut-key">Escape</div>
+                    <div class="shortcut-desc">Close overlay</div>
+                </div>
+                <div class="shortcut-card">
+                    <div class="shortcut-key">Ctrl+Enter</div>
+                    <div class="shortcut-desc">Generate code</div>
+                </div>
+                <div class="shortcut-card">
+                    <div class="shortcut-key">Ctrl+Shift+C</div>
+                    <div class="shortcut-desc">Copy response</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="custom-shortcut">Custom Activation Shortcut</label>
+                <input type="text" id="custom-shortcut" placeholder="e.g., Ctrl+Alt+H" readonly>
+                <div class="help-text">Click and press your desired key combination</div>
+            </div>
+            
+            <button class="btn btn-primary" id="save-shortcuts">💾 Save Shortcuts</button>
+            <div class="success-message" id="shortcuts-success">✅ Shortcuts saved successfully!</div>
+        </div>
+        
+        <!-- Overlay Tab -->
+        <div class="tab-content" data-content="overlay">
+            <h3>Overlay Appearance</h3>
+            
+            <div class="form-group">
+                <label>Overlay Position</label>
+                <div class="overlay-preview">
+                    <p>Choose where the overlay appears on your screen:</p>
+                    <div class="position-grid">
+                        <div class="position-option" data-position="top-left"></div>
+                        <div class="position-option" data-position="top-center"></div>
+                        <div class="position-option" data-position="top-right"></div>
+                        <div class="position-option" data-position="center-left"></div>
+                        <div class="position-option" data-position="center"></div>
+                        <div class="position-option" data-position="center-right"></div>
+                        <div class="position-option" data-position="bottom-left"></div>
+                        <div class="position-option" data-position="bottom-center"></div>
+                        <div class="position-option active" data-position="bottom-right"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="overlay-opacity">Opacity</label>
+                    <input type="range" id="overlay-opacity" min="0.5" max="1" step="0.1" value="0.95">
+                </div>
+                <div class="form-group">
+                    <label for="auto-hide">Auto-hide delay (seconds)</label>
+                    <input type="number" id="auto-hide" min="0" max="60" value="0" placeholder="0 = never">
+                </div>
+            </div>
+            
+            <div class="success-message" id="overlay-success">✅ Overlay settings saved!</div>
+            
+            <button class="btn btn-primary" id="save-overlay-settings">💾 Save Overlay Settings</button>
+            <button class="btn btn-secondary" id="preview-overlay">👁️ Preview Overlay</button>
+        </div>
+        
+        <!-- About Tab -->
+        <div class="tab-content" data-content="about">
+            <h3>About Code Helper</h3>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <div style="font-size: 4em; margin-bottom: 20px;">🚀</div>
+                <h2>Code Helper v1.0.0</h2>
+                <p style="opacity: 0.8; margin-bottom: 30px;">Your intelligent, context-aware coding assistant</p>
+            </div>
+            
+            <div style="background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h4>✨ Features</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin: 10px 0;">🌍 Cross-platform compatibility (macOS & Windows)</li>
+                    <li style="margin: 10px 0;">🔧 Universal code integration with any editor</li>
+                    <li style="margin: 10px 0;">🧠 AI-powered code generation and suggestions</li>
+                    <li style="margin: 10px 0;">🎯 Intelligent language detection</li>
+                    <li style="margin: 10px 0;">📊 Real-time code analysis</li>
+                    <li style="margin: 10px 0;">⚡ Non-intrusive overlay interface</li>
+                </ul>
+            </div>
+            
+            <div style="background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h4>🌐 Supported Languages</h4>
+                <p>JavaScript/TypeScript, Python, Java, C++, C#, Go, Rust, CSS, HTML, SQL, JSON, YAML, and more!</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-secondary" onclick="require('electron').shell.openExternal('https://github.com')" style="margin: 5px;">📚 Documentation</button>
+                <button class="btn btn-secondary" onclick="require('electron').shell.openExternal('https://github.com')" style="margin: 5px;">🐛 Report Issue</button>
+                <button class="btn btn-secondary" onclick="require('electron').shell.openExternal('https://github.com')" style="margin: 5px;">⭐ Star on GitHub</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+                
+                // Update active tab
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update active content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.querySelector(`[data-content="${targetTab}"]`).classList.add('active');
+            });
+        });
+        
+        // Load settings on startup
+        let currentSettings = {};
+        
+        function loadSettings() {
+            ipcRenderer.send('get-settings');
+        }
+        
+        ipcRenderer.on('settings-data', (event, settings) => {
+            currentSettings = settings;
+            updateUI(settings);
+        });
+        
+        function updateUI(settings) {
+            // AI settings
+            document.getElementById('api-provider').value = settings.apiProvider || 'openai';
+            const currentProvider = settings.apiProvider || 'openai';
+            const apiKey = settings.apiKeys && settings.apiKeys[currentProvider] ? settings.apiKeys[currentProvider] : '';
+            document.getElementById('api-key').value = apiKey;
+            document.getElementById('model').value = settings.model || 'gpt-3.5-turbo';
+            document.getElementById('temperature').value = settings.temperature || 0.7;
+            
+            // Update API help text
+            updateApiHelp(currentProvider);
+            
+            // Update API status
+            const apiStatus = document.getElementById('api-status');
+            if (apiKey) {
+                apiStatus.className = 'status-indicator connected';
+            } else {
+                apiStatus.className = 'status-indicator disconnected';
+            }
+            
+            // Overlay settings
+            document.getElementById('overlay-opacity').value = settings.overlayOpacity || 0.95;
+            document.getElementById('auto-hide').value = settings.autoHideDelay || 0;
+            
+            // Update position selector
+            document.querySelectorAll('.position-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            const activePosition = document.querySelector(`[data-position="${settings.overlayPosition || 'bottom-right'}"]`);
+            if (activePosition) {
+                activePosition.classList.add('active');
+            }
+        }
+        
+        function updateApiHelp(provider) {
+            const helpElement = document.getElementById('api-help');
+            switch (provider) {
+                case 'openai':
+                    helpElement.innerHTML = 'Get your OpenAI API key from: <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #6495ed;">https://platform.openai.com/api-keys</a>';
+                    break;
+                case 'gemini':
+                    helpElement.innerHTML = 'Get your Gemini API key from: <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: #6495ed;">https://makersuite.google.com/app/apikey</a>';
+                    break;
+                case 'claude':
+                    helpElement.innerHTML = 'Get your Claude API key from: <a href="https://console.anthropic.com/" target="_blank" style="color: #6495ed;">https://console.anthropic.com/</a>';
+                    break;
+                case 'ollama':
+                    helpElement.innerHTML = 'Install Ollama locally: <a href="https://ollama.ai/" target="_blank" style="color: #6495ed;">https://ollama.ai/</a> - No API key needed for local models';
+                    break;
+                default:
+                    helpElement.innerHTML = 'Please select an AI provider to see setup instructions.';
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('api-provider').addEventListener('change', (e) => {
+            const selectedProvider = e.target.value;
+            updateApiHelp(selectedProvider);
+            
+            // Load API key for selected provider
+            const apiKey = currentSettings.apiKeys && currentSettings.apiKeys[selectedProvider] ? currentSettings.apiKeys[selectedProvider] : '';
+            document.getElementById('api-key').value = apiKey;
+            
+            // Update API status
+            const apiStatus = document.getElementById('api-status');
+            if (apiKey) {
+                apiStatus.className = 'status-indicator connected';
+            } else {
+                apiStatus.className = 'status-indicator disconnected';
+            }
+        });
+        
+        document.getElementById('save-ai-settings').addEventListener('click', () => {
+            const provider = document.getElementById('api-provider').value;
+            const apiKey = document.getElementById('api-key').value;
+            
+            // Update the apiKeys object for the current provider
+            const newApiKeys = { ...currentSettings.apiKeys };
+            newApiKeys[provider] = apiKey;
+            
+            const settings = {
+                apiProvider: provider,
+                apiKeys: newApiKeys,
+                model: document.getElementById('model').value,
+                temperature: parseFloat(document.getElementById('temperature').value)
+            };
+            
+            ipcRenderer.send('save-settings', settings);
+            showMessage('ai-success', 'AI settings saved successfully!');
+            
+            // Update UI to reflect changes
+            currentSettings = { ...currentSettings, ...settings };
+            updateUI(currentSettings);
+        });
+        
+        document.getElementById('test-api').addEventListener('click', async () => {
+            const apiKey = document.getElementById('api-key').value;
+            const provider = document.getElementById('api-provider').value;
+            
+            if (!apiKey) {
+                showMessage('ai-error', 'Please enter an API key first.', true);
+                return;
+            }
+            
+            // Test with a simple request
+            ipcRenderer.send('generate-code', {
+                prompt: 'Say hello',
+                code: 'console.log("test");',
+                context: { language: 'javascript', lines: 1 }
+            });
+        });
+        
+        document.getElementById('save-overlay-settings').addEventListener('click', () => {
+            const activePosition = document.querySelector('.position-option.active');
+            const settings = {...currentSettings,
+                overlayPosition: activePosition ? activePosition.dataset.position : 'bottom-right',
+                overlayOpacity: parseFloat(document.getElementById('overlay-opacity').value),
+                autoHideDelay: parseInt(document.getElementById('auto-hide').value)
+            };
+            
+            ipcRenderer.send('save-overlay-settings', settings);
+            showMessage('overlay-success', 'Overlay settings saved!');
+            
+            // Update current settings
+            currentSettings = {  ...settings };
+        });
+        
+        document.getElementById('preview-overlay').addEventListener('click', () => {
+            // Trigger overlay preview
+            ipcRenderer.send('hide-overlay'); // Hide current
+            setTimeout(() => {
+                ipcRenderer.send('show-overlay', 'function example() {\n    return "Hello, World!";\n}');
+            }, 100);
+        });
+        
+        // Shortcuts functionality
+        document.getElementById('save-shortcuts').addEventListener('click', () => {
+            const customShortcut = document.getElementById('custom-shortcut').value.trim();
+            const shortcuts = {
+                activate: 'CommandOrControl+L',
+                quickHelp: 'CommandOrControl+Shift+C',
+                devMode: 'F12'
+            };
+            
+            const customShortcuts = [];
+            if (customShortcut) {
+                customShortcuts.push({
+                    key: customShortcut,
+                    description: 'Custom activation shortcut'
+                });
+            }
+            
+            ipcRenderer.send('save-shortcut-settings', {
+                shortcuts: shortcuts,
+                customShortcuts: customShortcuts
+            });
+            
+            showMessage('shortcuts-success', 'Shortcuts saved successfully!');
+        });
+        
+        // Custom shortcut capture
+        document.getElementById('custom-shortcut').addEventListener('keydown', (e) => {
+            e.preventDefault();
+            
+            const keys = [];
+            if (e.ctrlKey) keys.push('Ctrl');
+            if (e.metaKey) keys.push('Cmd');
+            if (e.altKey) keys.push('Alt');
+            if (e.shiftKey) keys.push('Shift');
+            
+            if (e.key && !['Control', 'Meta', 'Alt', 'Shift'].includes(e.key)) {
+                keys.push(e.key.toUpperCase());
+            }
+            
+            if (keys.length > 1) {
+                document.getElementById('custom-shortcut').value = keys.join('+');
+            }
+        });
+        
+        // Position selector
+        document.querySelectorAll('.position-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.position-option').forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+            });
+        });
+        
+        function showMessage(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Listen for IPC events
+        ipcRenderer.on('settings-saved', () => {
+            console.log('Settings saved');
+        });
+        
+        ipcRenderer.on('code-generated', (event, response) => {
+            showMessage('ai-success', 'API connection successful!');
+            document.getElementById('api-status').className = 'status-indicator connected';
+        });
+        
+        ipcRenderer.on('code-generation-error', (event, error) => {
+            showMessage('ai-error', `API test failed: ${error}`, true);
+            document.getElementById('api-status').className = 'status-indicator disconnected';
+        });
+        
+        ipcRenderer.on('overlay-settings-saved', () => {
+            console.log('Overlay settings saved successfully');
+        });
+        
+        ipcRenderer.on('shortcut-settings-saved', () => {
+            console.log('Shortcut settings saved successfully');
+        });
+        
+        // Initialize
+        loadSettings();
+    </script>
+</body>
+</html>

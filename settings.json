@@ -1,0 +1,24 @@
+{
+  "overlayPosition": "bottom-right",
+  "overlayOpacity": 0.95,
+  "autoHideDelay": 0,
+  "apiKeys": {
+    "openai": "",
+    "gemini": "AIzaSyDu57cIaA7UjsnPRGBRLN1W3rcE6kCSTOA",
+    "claude": "",
+    "ollama": ""
+  },
+  "apiProvider": "gemini",
+  "model": "gemini-2.0-flash",
+  "temperature": 0.7,
+  "shortcuts": {
+    "activate": "CommandOrControl+L",
+    "quickHelp": "CommandOrControl+Shift+C",
+    "devMode": "F12"
+  },
+  "customShortcuts": [],
+  "pos": {
+    "x": 773,
+    "y": 648
+  }
+}

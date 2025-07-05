@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Code Helper Overlay</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="overlay-container" id="overlay-container">
+        <div class="header" id="header">
+            <div class="title">
+                🤖 Code Helper
+            </div>
+            <div class="controls">
+                <button class="control-btn" id="position-btn" title="Change Position">📍</button>
+                <button class="control-btn" id="settings-btn" title="Settings">⚙️</button>
+                <button class="control-btn" id="close-btn" title="Close">✕</button>
+            </div>
+        </div>
+        
+        <div class="scrollable-content">
+          <div class="position-selector" id="position-selector">
+            <div class="position-grid">
+                <div class="position-option" data-position="top-left"></div>
+                <div class="position-option" data-position="top-center"></div>
+                <div class="position-option" data-position="top-right"></div>
+                <div class="position-option" data-position="center-left"></div>
+                <div class="position-option" data-position="center"></div>
+                <div class="position-option" data-position="center-right"></div>
+                <div class="position-option" data-position="bottom-left"></div>
+                <div class="position-option" data-position="bottom-center"></div>
+                <div class="position-option" data-position="bottom-right"></div>
+            </div>
+        </div>
+        
+        <div class="code-preview" id="code-preview">
+            <div class="code-header">
+                <div class="code-info">
+                    <span class="language-tag" id="language-tag">UNKNOWN</span>
+                    <span id="line-count">0 lines</span>
+                </div>
+                <button class="expand-btn" id="expand-btn">👁️ View Code</button>
+            </div>
+            <div class="code-snippet collapsed" id="code-snippet">
+                <div id="code-content">No code detected. Copy code and press the shortcut!</div>
+                <div class="fade-overlay"></div>
+            </div>
+        </div>
+        
+        <div class="prompt-section">
+            <textarea 
+                class="prompt-input" 
+                id="prompt-input" 
+                placeholder="What would you like me to do with this code? (e.g., 'optimize this function', 'add error handling', 'explain this code')"
+                rows="2"
+            ></textarea>
+            
+            <div class="actions">
+                <button class="btn btn-primary" id="generate-btn">
+                    ✨ Generate
+                </button>
+                <!-- <button class="btn btn-secondary" id="analyze-btn">
+                    🔍 Analyze
+                </button>
+                <button class="btn btn-secondary" id="copy-btn">
+                    📋 Copy
+                </button> -->
+            </div>
+            
+            <div class="error" id="error-message" style="display: none;"></div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="ai-spinner"></div>
+            <span>AI is thinking...</span>
+        </div>
+        
+        <div class="response-section" id="response-section">
+            <div class="response-header">
+                <span class="response-title">AI Response</span>
+                <span class="provider-tag" id="provider-tag">GPT-3.5</span>
+            </div>
+            <div class="response-content" id="response-content"></div>
+            <div class="actions" style="margin-top: 12px;">
+                <button class="btn btn-secondary" id="copy-response-btn">📋 Copy Response</button>
+                <button class="btn btn-secondary" id="apply-btn">✅ Apply Changes</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    
+    <!-- Code Editor Modal -->
+    <div class="code-modal" id="code-modal">
+        <div class="code-editor-container">
+            <div class="code-editor-header">
+                <div class="code-editor-title">Code Editor</div>
+                <div class="code-editor-controls">
+                    <button class="control-btn" id="save-code-btn" title="Save Changes">💾</button>
+                    <button class="control-btn" id="close-modal-btn" title="Close">✕</button>
+                </div>
+            </div>
+            <textarea class="code-editor" id="code-editor" placeholder="Enter your code here..."></textarea>
+        </div>
+    </div>
+
+  <script src="overlay.js"></script>
+</body>
+</html>

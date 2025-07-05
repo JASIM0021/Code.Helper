@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Code Helper - Agentic Interface</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: transparent;
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        .overlay-container {
+            width: 450px;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            color: white;
+            overflow: hidden;
+            position: relative;
+            cursor: move;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .overlay-container.dragging {
+            transform: scale(1.02);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+        }
+        
+        /* Agentic States */
+        .overlay-container.thinking {
+            border: 2px solid transparent;
+            background: linear-gradient(rgba(30, 30, 30, 0.95), rgba(30, 30, 30, 0.95)) padding-box,
+                       linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c) border-box;
+            animation: thinkingPulse 2s ease-in-out infinite;
+        }
+        
+        .overlay-container.generating {
+            border: 2px solid transparent;
+            background: linear-gradient(rgba(30, 30, 30, 0.95), rgba(30, 30, 30, 0.95)) padding-box,
+                       linear-gradient(45deg, #4facfe, #00f2fe, #43e97b, #38f9d7) border-box;
+            animation: generatingPulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes thinkingPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        @keyframes generatingPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+        }
+        
+        .header {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+        
+        .title {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .agentic-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        
+        .agentic-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #4facfe;
+            animation: agenticPulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes agenticPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .control-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .code-preview {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            cursor: default;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .code-info {
+            font-size: 11px;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .language-tag {
+            background: rgba(100, 149, 237, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        .context-indicator {
+            background: rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        .expand-btn {
+            background: none;
+            border: none;
+            color: #6495ed;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .expand-btn:hover {
+            background: rgba(100, 149, 237, 0.2);
+        }
+        
+        .code-snippet {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 11px;
+            line-height: 1.4;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            max-height: 60px;
+            color: #e6e6e6;
+            white-space: pre-wrap;
+        }
+        
+        .code-snippet.collapsed {
+            max-height: 60px;
+            overflow: hidden;
+        }
+        
+        .code-snippet.expanded {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .fade-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.8));
+            pointer-events: none;
+        }
+        
+        .code-snippet.expanded .fade-overlay {
+            display: none;
+        }
+        
+        .prompt-section {
+            padding: 16px;
+            cursor: default;
+        }
+        
+        .prompt-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            transition: all 0.2s ease;
+            min-height: 40px;
+            max-height: 80px;
+            font-family: inherit;
+        }
+        
+        .prompt-input:focus {
+            border-color: #6495ed;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .prompt-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: #6495ed;
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #5a85d8;
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:disabled {
+            background: rgba(100, 149, 237, 0.3);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-primary.thinking {
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradientShift 2s ease-in-out infinite;
+        }
+        
+        .btn-primary.generating {
+            background: linear-gradient(45deg, #4facfe, #00f2fe, #43e97b, #38f9d7);
+            background-size: 400% 400%;
+            animation: gradientShift 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        /* Agentic Thinking State */
+        .thinking-state {
+            padding: 16px;
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .thinking-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .thinking-spinner {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: spinGradient 1s linear infinite, gradientShift 2s ease-in-out infinite;
+            position: relative;
+        }
+        
+        .thinking-spinner::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 50%;
+        }
+        
+        @keyframes spinGradient {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .thinking-message {
+            font-size: 13px;
+            font-weight: 500;
+            color: #e6e6e6;
+        }
+        
+        .thinking-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .thinking-progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradientShift 2s ease-in-out infinite;
+            transition: width 0.3s ease;
+        }
+        
+        .thinking-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .thinking-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            opacity: 0.8;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .thinking-step.active {
+            opacity: 1;
+            background: rgba(100, 149, 237, 0.2);
+            color: #6495ed;
+        }
+        
+        .thinking-step.completed {
+            opacity: 0.6;
+            color: #22c55e;
+        }
+        
+        .step-number {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .thinking-step.active .step-number {
+            background: #6495ed;
+        }
+        
+        .thinking-step.completed .step-number {
+            background: #22c55e;
+        }
+        
+        /* Agentic Response */
+        .agentic-response {
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            display: none;
+            cursor: default;
+        }
+        
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .response-title {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .response-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .provider-tag {
+            font-size: 10px;
+            background: rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .response-content {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 11px;
+            line-height: 1.4;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            color: #e6e6e6;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .response-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .response-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .response-btn.copy {
+            background: rgba(100, 149, 237, 0.2);
+            color: #6495ed;
+            border: 1px solid rgba(100, 149, 237, 0.3);
+        }
+        
+        .response-btn.copy:hover {
+            background: rgba(100, 149, 237, 0.3);
+        }
+        
+        .response-btn.apply {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .response-btn.apply:hover {
+            background: rgba(34, 197, 94, 0.3);
+        }
+        
+        .error {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+        
+        /* Scrollbar styling */
+        .scrollable-content {
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+        
+        .scrollable-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollable-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .scrollable-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        
+        .scrollable-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay-container" id="overlay-container">
+        <div class="header" id="header">
+            <div class="title">
+                <span>🤖</span>
+                <span>Code Helper</span>
+                <div class="agentic-indicator">
+                    <div class="agentic-dot"></div>
+                    <span>Agentic</span>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="control-btn" id="settings-btn" title="Settings">⚙️</button>
+                <button class="control-btn" id="position-btn" title="Position">📍</button>
+                <button class="control-btn" id="close-btn" title="Close">✕</button>
+            </div>
+        </div>
+        
+        <div class="code-preview" id="code-preview">
+            <div class="code-header">
+                <div class="code-info">
+                    <span class="language-tag" id="language-tag">UNKNOWN</span>
+                    <span class="context-indicator" id="context-indicator">Context-Aware</span>
+                    <span id="line-count">0 lines</span>
+                </div>
+                <button class="expand-btn" id="expand-btn">👁️ View Code</button>
+            </div>
+            <div class="code-snippet collapsed" id="code-snippet">
+                <div class="fade-overlay"></div>
+                <div id="code-content">No code detected. Copy code and press the shortcut!</div>
+            </div>
+        </div>
+        
+        <div class="prompt-section" id="prompt-section">
+            <textarea class="prompt-input" id="prompt-input" placeholder="Describe what you want me to do with your code..."></textarea>
+            <div class="actions">
+                <button class="btn btn-primary" id="generate-btn">🚀 Generate</button>
+                <button class="btn btn-secondary" id="clear-btn">🗑️ Clear</button>
+            </div>
+        </div>
+        
+        <!-- Agentic Thinking State -->
+        <div class="thinking-state" id="thinking-state">
+            <div class="thinking-header">
+                <div class="thinking-spinner"></div>
+                <div class="thinking-message" id="thinking-message">🤔 Analyzing your code and request...</div>
+            </div>
+            <div class="thinking-progress">
+                <div class="thinking-progress-bar" id="thinking-progress-bar" style="width: 0%"></div>
+            </div>
+            <div class="thinking-steps" id="thinking-steps"></div>
+        </div>
+        
+        <!-- Agentic Response -->
+        <div class="agentic-response" id="agentic-response">
+            <div class="response-header">
+                <div class="response-title">
+                    <div class="response-avatar">AI</div>
+                    <span>Response</span>
+                </div>
+                <div class="provider-tag" id="provider-tag">OpenAI GPT-4</div>
+            </div>
+            <div class="response-content" id="response-content"></div>
+            <div class="response-actions">
+                <button class="response-btn copy" id="copy-response-btn">📋 Copy</button>
+                <button class="response-btn apply" id="apply-btn">✅ Apply</button>
+            </div>
+        </div>
+        
+        <div class="error" id="error-message" style="display: none;"></div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        // Elements
+        const overlayContainer = document.getElementById('overlay-container');
+        const header = document.getElementById('header');
+        const codePreview = document.getElementById('code-preview');
+        const codeSnippet = document.getElementById('code-snippet');
+        const codeContent = document.getElementById('code-content');
+        const languageTag = document.getElementById('language-tag');
+        const contextIndicator = document.getElementById('context-indicator');
+        const lineCount = document.getElementById('line-count');
+        const expandBtn = document.getElementById('expand-btn');
+        const promptInput = document.getElementById('prompt-input');
+        const generateBtn = document.getElementById('generate-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const closeBtn = document.getElementById('close-btn');
+        const settingsBtn = document.getElementById('settings-btn');
+        const positionBtn = document.getElementById('position-btn');
+        
+        // Agentic elements
+        const thinkingState = document.getElementById('thinking-state');
+        const thinkingMessage = document.getElementById('thinking-message');
+        const thinkingProgressBar = document.getElementById('thinking-progress-bar');
+        const thinkingSteps = document.getElementById('thinking-steps');
+        const agenticResponse = document.getElementById('agentic-response');
+        const responseContent = document.getElementById('response-content');
+        const providerTag = document.getElementById('provider-tag');
+        const copyResponseBtn = document.getElementById('copy-response-btn');
+        const applyBtn = document.getElementById('apply-btn');
+        const errorMessage = document.getElementById('error-message');
+        
+        // State
+        let currentCode = '';
+        let currentCodeContext = {};
+        let settings = {};
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let currentThinkingSteps = [];
+        
+        // Initialize
+        init();
+        
+        function init() {
+            loadSettings();
+            setupEventListeners();
+            setupDragAndDrop();
+            focusPromptInput();
+        }
+        
+        function loadSettings() {
+            ipcRenderer.send('get-settings');
+        }
+        
+        function setupEventListeners() {
+            // Button events
+            generateBtn.addEventListener('click', generateCodeAgentic);
+            clearBtn.addEventListener('click', clearAll);
+            closeBtn.addEventListener('click', closeOverlay);
+            settingsBtn.addEventListener('click', openSettings);
+            positionBtn.addEventListener('click', togglePositionSelector);
+            expandBtn.addEventListener('click', toggleCodeExpansion);
+            copyResponseBtn.addEventListener('click', copyResponse);
+            applyBtn.addEventListener('click', applyChanges);
+            
+            // Input events
+            promptInput.addEventListener('keydown', handlePromptKeydown);
+            promptInput.addEventListener('input', handlePromptInput);
+            
+            // IPC events
+            ipcRenderer.on('show-overlay', handleShowOverlay);
+            ipcRenderer.on('settings-data', handleSettingsData);
+            ipcRenderer.on('code-analysis', handleCodeAnalysis);
+            ipcRenderer.on('code-generated-agentic', handleCodeGeneratedAgentic);
+            ipcRenderer.on('code-generation-error', handleGenerationError);
+            ipcRenderer.on('agentic-thinking-update', handleThinkingUpdate);
+            ipcRenderer.on('agentic-generating-update', handleGeneratingUpdate);
+            ipcRenderer.on('code-selection-detected', handleCodeSelectionDetected);
+        }
+        
+        function setupDragAndDrop() {
+            let startX, startY, currentX, currentY;
+            
+            function handleMouseDown(e) {
+                if (!header.contains(e.target)) return;
+                
+                isDragging = true;
+                overlayContainer.classList.add('dragging');
+                
+                const rect = overlayContainer.getBoundingClientRect();
+                dragOffset.x = e.clientX - rect.left;
+                dragOffset.y = e.clientY - rect.top;
+                
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+                
+                e.preventDefault();
+            }
+            
+            function handleMouseMove(e) {
+                if (!isDragging) return;
+                
+                currentX = e.clientX;
+                currentY = e.clientY;
+                
+                const newX = currentX - dragOffset.x;
+                const newY = currentY - dragOffset.y;
+                
+                const maxX = window.screen.width - overlayContainer.offsetWidth;
+                const maxY = window.screen.height - overlayContainer.offsetHeight;
+                
+                const constrainedX = Math.max(0, Math.min(newX, maxX));
+                const constrainedY = Math.max(0, Math.min(newY, maxY));
+                
+                overlayContainer.style.position = 'fixed';
+                overlayContainer.style.left = constrainedX + 'px';
+                overlayContainer.style.top = constrainedY + 'px';
+            }
+            
+            function handleMouseUp(e) {
+                if (!isDragging) return;
+                
+                isDragging = false;
+                overlayContainer.classList.remove('dragging');
+                
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            }
+            
+            header.addEventListener('mousedown', handleMouseDown);
+        }
+        
+        function handleShowOverlay(event, selectedCode, context) {
+            currentCode = selectedCode || '';
+            currentCodeContext = context || {};
+            
+            if (currentCode.trim()) {
+                updateCodePreview(currentCode);
+                if (context) {
+                    updateContextIndicator(context);
+                } else {
+                    analyzeCode();
+                }
+            } else {
+                showNoCodeState();
+            }
+            
+            focusPromptInput();
+            hideError();
+            hideResponse();
+            hideThinking();
+        }
+        
+        function handleCodeSelectionDetected(event, { code, context }) {
+            currentCode = code;
+            currentCodeContext = context;
+            
+            if (currentCode.trim()) {
+                updateCodePreview(currentCode);
+                updateContextIndicator(context);
+            }
+        }
+        
+        function handleSettingsData(event, settingsData) {
+            settings = settingsData;
+        }
+        
+        function handleCodeAnalysis(event, analysis) {
+            currentCodeContext = analysis;
+            languageTag.textContent = analysis.language.toUpperCase();
+            lineCount.textContent = `${analysis.lines} lines`;
+        }
+        
+        function handleCodeGeneratedAgentic(event, response) {
+            hideThinking();
+            overlayContainer.classList.remove('thinking', 'generating');
+            generateBtn.classList.remove('thinking', 'generating');
+            showAgenticResponse(response);
+        }
+        
+        function handleThinkingUpdate(event, thinkingState) {
+            showThinking(thinkingState);
+        }
+        
+        function handleGeneratingUpdate(event, generatingState) {
+            showGenerating(generatingState);
+        }
+        
+        function handleGenerationError(event, error) {
+            hideThinking();
+            overlayContainer.classList.remove('thinking', 'generating');
+            generateBtn.classList.remove('thinking', 'generating');
+            showError(error);
+        }
+        
+        function updateCodePreview(code) {
+            currentCode = code;
+            const lines = code.split('\n');
+            const previewLines = lines.slice(0, 3);
+            const displayCode = previewLines.join('\n');
+            const hasMore = lines.length > 3;
+            
+            codeContent.textContent = displayCode + (hasMore ? '\n...' : '');
+            lineCount.textContent = `${lines.length} lines`;
+            
+            codeSnippet.classList.remove('expanded');
+            codeSnippet.classList.add('collapsed');
+            expandBtn.textContent = '👁️ View Code';
+        }
+        
+        function updateContextIndicator(context) {
+            if (context.language && context.language !== 'unknown') {
+                languageTag.textContent = context.language.toUpperCase();
+            }
+            if (context.lines) {
+                lineCount.textContent = `${context.lines} lines`;
+            }
+            contextIndicator.textContent = 'Context-Aware';
+        }
+        
+        function showNoCodeState() {
+            codeContent.textContent = 'No code detected. Copy code and press the shortcut!';
+            languageTag.textContent = 'UNKNOWN';
+            lineCount.textContent = '0 lines';
+            contextIndicator.textContent = 'No Context';
+            currentCode = '';
+            currentCodeContext = {};
+        }
+        
+        function toggleCodeExpansion() {
+            if (!currentCode.trim()) {
+                showError('No code to view. Please copy some code first.');
+                return;
+            }
+            
+            if (codeSnippet.classList.contains('expanded')) {
+                codeSnippet.classList.remove('expanded');
+                codeSnippet.classList.add('collapsed');
+                expandBtn.textContent = '👁️ View Code';
+                updateCodePreview(currentCode);
+            } else {
+                codeContent.textContent = currentCode;
+                codeSnippet.classList.remove('collapsed');
+                codeSnippet.classList.add('expanded');
+                expandBtn.textContent = '👁️ Collapse';
+            }
+        }
+        
+        function generateCodeAgentic() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                showError('Please enter a prompt describing what you want me to do with the code.');
+                return;
+            }
+            
+            if (!currentCode.trim()) {
+                showError('No code detected. Please copy some code first.');
+                return;
+            }
+            
+            const currentProvider = settings.apiProvider || 'openai';
+            const apiKey = settings.apiKeys && settings.apiKeys[currentProvider];
+            
+            if (!apiKey && currentProvider !== 'ollama') {
+                showError(`API key not configured for ${currentProvider}. Please add your API key in settings.`);
+                return;
+            }
+            
+            showThinking({
+                state: 'thinking',
+                message: '🤔 Analyzing your code and request...',
+                progress: 0,
+                steps: []
+            });
+            
+            hideError();
+            hideResponse();
+            
+            ipcRenderer.send('generate-code-agentic', {
+                prompt: prompt,
+                code: currentCode,
+                context: currentCodeContext
+            });
+        }
+        
+        function showThinking(thinkingState) {
+            overlayContainer.classList.add('thinking');
+            generateBtn.classList.add('thinking');
+            generateBtn.disabled = true;
+            
+            thinkingMessage.textContent = thinkingState.message;
+            thinkingProgressBar.style.width = `${thinkingState.progress}%`;
+            
+            // Update thinking steps
+            if (thinkingState.steps) {
+                currentThinkingSteps = thinkingState.steps;
+                updateThinkingSteps(thinkingState.steps);
+            }
+            
+            thinkingState.style.display = 'block';
+        }
+        
+        function showGenerating(generatingState) {
+            overlayContainer.classList.remove('thinking');
+            overlayContainer.classList.add('generating');
+            generateBtn.classList.remove('thinking');
+            generateBtn.classList.add('generating');
+            
+            thinkingMessage.textContent = generatingState.message;
+        }
+        
+        function hideThinking() {
+            overlayContainer.classList.remove('thinking', 'generating');
+            generateBtn.classList.remove('thinking', 'generating');
+            generateBtn.disabled = false;
+            thinkingState.style.display = 'none';
+        }
+        
+        function updateThinkingSteps(steps) {
+            thinkingSteps.innerHTML = '';
+            
+            steps.forEach((step, index) => {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'thinking-step active';
+                stepElement.innerHTML = `
+                    <div class="step-number">${step.step}</div>
+                    <div class="step-message">${step.message}</div>
+                `;
+                thinkingSteps.appendChild(stepElement);
+            });
+        }
+        
+        function showAgenticResponse(response) {
+            responseContent.textContent = response.generated;
+            providerTag.textContent = response.provider;
+            
+            // Show agentic metadata if available
+            if (response.agenticMetadata) {
+                const metadata = response.agenticMetadata;
+                console.log('Agentic response metadata:', metadata);
+            }
+            
+            agenticResponse.style.display = 'block';
+        }
+        
+        function hideResponse() {
+            agenticResponse.style.display = 'none';
+        }
+        
+        function copyResponse() {
+            const response = responseContent.textContent;
+            if (response.trim()) {
+                ipcRenderer.send('copy-to-clipboard', response);
+                showTemporaryFeedback(copyResponseBtn, '✅ Copied!', '📋 Copy');
+            }
+        }
+        
+        function applyChanges() {
+            const response = responseContent.textContent;
+            if (response.trim()) {
+                currentCode = response;
+                updateCodePreview(response);
+                ipcRenderer.send('copy-to-clipboard', response);
+                showTemporaryFeedback(applyBtn, '✅ Applied!', '✅ Apply');
+                hideResponse();
+            }
+        }
+        
+        function clearAll() {
+            currentCode = '';
+            currentCodeContext = {};
+            promptInput.value = '';
+            showNoCodeState();
+            hideError();
+            hideResponse();
+            hideThinking();
+            focusPromptInput();
+        }
+        
+        function closeOverlay() {
+            ipcRenderer.send('hide-overlay');
+        }
+        
+        function openSettings() {
+            ipcRenderer.send('show-main-window');
+        }
+        
+        function togglePositionSelector() {
+            // Implementation for position selector
+            console.log('Position selector toggled');
+        }
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+        
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+        
+        function showTemporaryFeedback(button, tempText, originalText) {
+            const original = button.textContent;
+            button.textContent = tempText;
+            setTimeout(() => {
+                button.textContent = originalText || original;
+            }, 2000);
+        }
+        
+        function focusPromptInput() {
+            setTimeout(() => {
+                promptInput.focus();
+            }, 100);
+        }
+        
+        function handlePromptKeydown(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                generateCodeAgentic();
+            } else if (e.key === 'Escape') {
+                closeOverlay();
+            }
+        }
+        
+        function handlePromptInput() {
+            promptInput.style.height = 'auto';
+            promptInput.style.height = Math.min(promptInput.scrollHeight, 80) + 'px';
+        }
+        
+        function analyzeCode() {
+            if (!currentCode.trim()) {
+                showError('No code to analyze. Please copy some code first.');
+                return;
+            }
+            
+            ipcRenderer.send('analyze-code', currentCode);
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeOverlay();
+            }
+        });
+    </script>
+</body>
+</html> 

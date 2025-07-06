@@ -1,0 +1,103 @@
+{
+  "name": "code-helper",
+  "version": "1.0.0",
+  "description": "Intelligent, context-aware code helper that works with any editor",
+  "main": "./src/main/main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build-mac": "electron-builder --mac",
+    "build-win": "electron-builder --win",
+    "build-all": "electron-builder --mac --win",
+    "pack": "electron-builder --dir",
+    "test": "node scripts/test.js",
+    "test-integration": "node scripts/integration-test.js",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
+  },
+  "keywords": [
+    "code",
+    "assistant",
+    "editor",
+    "overlay",
+    "cross-platform",
+    "electron",
+    "development",
+    "refactoring",
+    "suggestions"
+  ],
+  "author": "Code Helper Team",
+  "license": "MIT",
+  "build": {
+    "appId": "com.codehelper.app",
+    "productName": "Code.Helper",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin"
+    ],
+    "mac": {
+      "icon": "assets/icon.png",
+      "category": "public.app-category.developer-tools",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "icon": "assets/icon.png",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.8.1",
+    "@electron-forge/maker-deb": "^7.8.1",
+    "@electron-forge/maker-dmg": "^7.8.1",
+    "@electron-forge/maker-rpm": "^7.8.1",
+    "@electron-forge/maker-squirrel": "^7.8.1",
+    "@electron-forge/maker-zip": "^7.8.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.1",
+    "@electron-forge/plugin-fuses": "^7.8.1",
+    "@electron-forge/publisher-github": "^7.8.1",
+    "@electron/fuses": "^1.8.0",
+    "electron": "^37.2.0",
+    "electron-reloader": "^1.2.3"
+  },
+  "dependencies": {
+    "active-win": "^8.2.1",
+    "axios": "^1.10.0",
+    "electron-squirrel-startup": "^1.0.1",
+    "highlight.js": "^11.11.1",
+    "robotjs": "^0.6.0"
+  }
+}

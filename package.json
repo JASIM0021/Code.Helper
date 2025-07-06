@@ -14,7 +14,8 @@
     "test": "node scripts/test.js",
     "test-integration": "node scripts/integration-test.js",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "publish":"npx electron-forge publish -- --from-dry-run"
   },
   "keywords": [
     "code",

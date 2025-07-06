@@ -123,9 +123,9 @@ npm run build-all
 
 ## Architecture 🏗️
 
-```
-  Please take a look PROJECT_ARCHITECTURE.MD
-```
+
+  Please take a look [PROJECT_ARCHITECTURE](https://github.com/JASIM0021/Code.Helper/blob/master/PROJECT_STRUCTURE.md).MD
+
 
 ## Development 🛠️
 

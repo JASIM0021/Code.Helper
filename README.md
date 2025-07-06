@@ -2,6 +2,12 @@
 
 An intelligent, context-aware code assistant that seamlessly works with any code editor as an external overlay, similar to Siri on macOS.
 
+
+https://github.com/user-attachments/assets/c6c0988c-23d3-4be2-a8ec-188c53007414
+
+
+
+
 ## Features ✨
 
 - **Cross-Platform Compatibility**: Works on both macOS and Windows
@@ -25,7 +31,7 @@ An intelligent, context-aware code assistant that seamlessly works with any code
 ### Quick Start
 ```bash
 # Clone or download this repository
-cd code-helper
+cd Code.Helper
 
 # Install dependencies
 npm install
@@ -118,13 +124,7 @@ npm run build-all
 ## Architecture 🏗️
 
 ```
-code-helper/
-├── main.js           # Main Electron process
-├── index.html        # Welcome/settings window
-├── overlay.html      # Code analysis overlay
-├── package.json      # Project configuration
-├── assets/           # Icons and resources
-└── README.md         # This file
+  Please take a look PROJECT_ARCHITECTURE.MD
 ```
 
 ## Development 🛠️

@@ -2,6 +2,12 @@
 
 An intelligent, context-aware code assistant that seamlessly works with any code editor as an external overlay, similar to Siri on macOS.
 
+
+https://github.com/user-attachments/assets/a7c49381-1b0c-4164-aa05-38350e10da49
+
+
+
+
 ## Features ✨
 
 - **Cross-Platform Compatibility**: Works on both macOS and Windows

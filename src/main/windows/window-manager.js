@@ -20,7 +20,7 @@ function createMainWindow() {
             enableRemoteModule: true
         },
         icon: path.join(__dirname, '../../../assets/icon.png'),
-        show: false // Hide initially
+        show: true // Hide initially
     });
 
     mainWindow.loadFile(path.join(__dirname, '../../renderer/pages/settings.html'));

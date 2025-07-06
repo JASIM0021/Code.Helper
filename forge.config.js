@@ -5,6 +5,7 @@ module.exports = {
   packagerConfig: {
     asar: true,
     icon: 'assets/icon',
+    extraResource: ['assets/icon.png'], // Makes sure it’s included
   },
 
   publishers: [
@@ -13,8 +14,9 @@ module.exports = {
       config: {
         repository: {
           owner: 'jasim0021',
-          name: 'Sk Jasimuddin',
+          name: 'Code.Helper',
         },
+
         prerelease: true,
       },
     },
@@ -25,7 +27,6 @@ module.exports = {
     {
       name: '@electron-forge/maker-dmg',
       config: {
-        background: './assets/background.png',
         icon: './assets/icon.png',
         format: 'ULFO',
       },

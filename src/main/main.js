@@ -21,6 +21,12 @@ async function initialize() {
     // Load settings first
     await loadSettings();
 
+    if (process.platform === 'darwin') {
+      const iconPath = path.join(__dirname, 'assets', 'icon.png');
+      app.dock.setIcon(iconPath);
+    }
+
+
     // Create windows
     mainWindow = createMainWindow();
     overlayWindow = createOverlayWindow();
@@ -54,7 +60,7 @@ async function initialize() {
 // App event handlers
 app.whenReady().then(initialize);
 
-app.dock.setIcon(path.join(process.cwd(), 'assets', 'icon.png'));
+
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

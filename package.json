@@ -15,7 +15,7 @@
     "test-integration": "node scripts/integration-test.js",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "publish":"npx electron-forge publish -- --from-dry-run"
+    "publish": "export GITHUB_TOKEN=$(cat .env | grep GITHUB_TOKEN | cut -d '=' -f2) && npx electron-forge publish -- --from-dry-run"
   },
   "keywords": [
     "code",
@@ -92,12 +92,12 @@
     "@electron-forge/publisher-github": "^7.8.1",
     "@electron/fuses": "^1.8.0",
     "electron": "^37.2.0",
-    "electron-reloader": "^1.2.3"
+    "electron-reloader": "^1.2.3",
+    "electron-squirrel-startup": "^1.0.1"
   },
   "dependencies": {
     "active-win": "^8.2.1",
     "axios": "^1.10.0",
-    "electron-squirrel-startup": "^1.0.1",
     "highlight.js": "^11.11.1",
     "robotjs": "^0.6.0"
   }
